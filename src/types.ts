@@ -20,11 +20,16 @@ export interface StoreGetter<S extends StateTree, T = any> {
   (state: S, getters: Record<string, Ref<any>>): T
 }
 
-export type DeepPartial<T> = { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = { [K in keyof T]?: any }
 // type DeepReadonly<T> = { readonly [P in keyof T]: DeepReadonly<T[P]> }
 
 export type SubscriptionCallback<S> = (
-  mutation: { storeName: string; type: string; payload: DeepPartial<S> },
+  mutation: {
+    storeName: string
+    type: string
+    payload: DeepPartial<S>
+    oldValues: DeepPartial<S>
+  },
   state: S
 ) => void
 

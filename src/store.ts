@@ -21,20 +21,20 @@ import {
 function innerPatch<T extends StateTree>(
   target: T,
   patchToApply: DeepPartial<T>
-): T {
+): DeepPartial<T> {
   // TODO: get all keys like symbols as well
+  const oldValues: DeepPartial<T> = {}
   for (const key in patchToApply) {
     const subPatch = patchToApply[key]
     const targetValue = target[key]
     if (isPlainObject(targetValue) && isPlainObject(subPatch)) {
-      target[key] = innerPatch(targetValue, subPatch)
+      oldValues[key] = innerPatch(targetValue, subPatch)
     } else {
-      // @ts-ignore
       target[key] = subPatch
+      oldValues[key] = targetValue
     }
   }
-
-  return target
+  return oldValues
 }
 
 /**
@@ -79,12 +79,12 @@ export function buildStore<
 
   function patch(partialState: DeepPartial<S>): void {
     isListening = false
-    // @ts-ignore FIXME: why is this even failing on TS
-    innerPatch(state.value, partialState)
+
+    const oldValues: DeepPartial<S> = innerPatch(state.value, partialState)
     isListening = true
     subscriptions.forEach(callback => {
       callback(
-        { storeName: id, type: '⤵️ patch', payload: partialState },
+        { storeName: id, type: '⤵️ patch', payload: partialState, oldValues },
         // @ts-ignore FIXME: why is this even failing on TS
         state.value
       )

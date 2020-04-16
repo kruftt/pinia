@@ -144,6 +144,36 @@ describe('Store', () => {
         payload: patch,
         storeName: 'main',
         type: expect.stringContaining('patch'),
+        oldValues: { a: true },
+      },
+      store.state
+    )
+  })
+
+  it('records nested values changed via patch', () => {
+    const store = useStore()
+    const spy = jest.fn()
+    store.subscribe(spy)
+
+    const patch = {
+      nested: {
+        foo: 'bar',
+        a: { b: 0 },
+      },
+    }
+    store.patch(patch)
+
+    expect(spy).toHaveBeenCalledWith(
+      {
+        payload: patch,
+        storeName: 'main',
+        type: expect.stringContaining('patch'),
+        oldValues: {
+          nested: {
+            foo: 'foo',
+            a: { b: 'string' },
+          },
+        },
       },
       store.state
     )
