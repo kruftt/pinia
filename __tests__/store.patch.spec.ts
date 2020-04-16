@@ -59,4 +59,33 @@ describe('store.patch', () => {
       },
     })
   })
+
+  it('caches old values', () => {
+    const store = useStore()
+    const spy = jest.fn()
+    store.subscribe(spy)
+
+    const patch = {
+      nested: {
+        foo: 'bar',
+        a: { b: 0 },
+      },
+    }
+    store.patch(patch)
+
+    expect(spy).toHaveBeenCalledWith(
+      {
+        payload: patch,
+        storeName: 'main',
+        type: expect.stringContaining('patch'),
+        oldValue: {
+          nested: {
+            foo: 'foo',
+            a: { b: 'string' },
+          },
+        },
+      },
+      store.state
+    )
+  })
 })

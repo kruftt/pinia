@@ -28,7 +28,7 @@ export type SubscriptionCallback<S> = (
     storeName: string
     type: string
     payload: DeepPartial<S>
-    oldValues: DeepPartial<S>
+    oldValue: DeepPartial<S>
   },
   state: S
 ) => void
